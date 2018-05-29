@@ -1,6 +1,6 @@
 # PMDK fault-resilient Queue sample
 
-The goal of this task is to create a small fault-resilient program using libpmemobj++, which are part of PMDK.
+The goal of this task is to create a small fault-resilient program using libpmemobj++.
 
 PMDK works on Non-Volatile Memory (NVM) but it can use regular DRAM as well by setting the environment variable in your shell:
 ```shell
