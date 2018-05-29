@@ -36,12 +36,15 @@ void show_queues(pmem::obj::pool<Queues> pool) {
 
 pmem::obj::pool<Queues> setup_pool(string path) {
   pmem::obj::pool<Queues> pool;
-  if (pmem::obj::pool<Queues>::check(path, layout) == 1) {
-    pool = pmem::obj::pool<Queues>::open(path, layout);
-  } else {
-    pool = pmem::obj::pool<Queues>::create(path, layout, PMEMOBJ_MIN_POOL, (S_IWUSR | S_IRUSR)); // write and read owner permission
-    initialize_pool(pool);
-    // show_queues(pool);
+  try {
+    if (pmem::obj::pool<Queues>::check(path, layout) == 1) {
+      pool = pmem::obj::pool<Queues>::open(path, layout);
+    } else {
+      pool = pmem::obj::pool<Queues>::create(path, layout, PMEMOBJ_MIN_POOL, (S_IWUSR | S_IRUSR)); // write and read owner permission
+      initialize_pool(pool);
+    }
+  } catch (pmem::pool_error &e) {
+    cerr << "[ERR] Pool error: " << e.what() << endl;
   }
   return pool;
 }
@@ -57,8 +60,8 @@ void pop_push_loop(pmem::obj::pool<Queues> pool, persistent_ptr<Queue> q, persis
         auto item  = p->pop(pool);
         q->push(pool,item);
       });
-    } catch (pmem::pool_error &pe) {
-      cerr << "[ERR] Transaction error: " << pe.what() << endl;
+    } catch (pmem::transaction_error &e) {
+      cerr << "[ERR] Transaction error: " << e.what() << endl;
     }
   }
 }
